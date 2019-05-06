@@ -1,0 +1,12 @@
+.search-results__list {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.list-item {
+    height: 200px;
+    width: 200px;
+    list-style: none;
+    border: 1px solid black;
+    margin: 5px;
+}
