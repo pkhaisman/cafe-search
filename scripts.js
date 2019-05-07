@@ -1,46 +1,47 @@
 'use-strict';
 
 function formatCafe(cafe) {
-    console.log('formatCafe ran');
-
     return `
-        <li class="list-item">${cafe}</li>
+        <li class="list-item">${cafe.venue.name}</li>
     `;
 }
 
 function renderCafes(searchResults) {
-    console.log('renderCafes ran');
-
     console.log(searchResults);
 
-    searchResults.restaurants.forEach(cafe => {
-        $('.search-results__list').append(formatCafe(cafe.restaurant.name));
+    $('.search-results__list').empty();
+    searchResults.response.groups[0].items.forEach(cafe => {
+        $('.search-results__list').append(formatCafe(cafe));
     })
 }
 
+function formatQueryParams(params) {
+    const queryItems = Object.keys(params)
+        .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
+    return queryItems.join('&');
+}
+
 function fetchCafes(coords) {
-    console.log('fetchCafes ran');
+    const endPoint = 'https://api.foursquare.com/v2/venues/explore'
+    const params = {
+        client_id: 'UVNI2LYVJN3GTR54P55RXNVXM3FQGOJCULNOF1QWPGSTW31F',
+        client_secret: '4BGOSAW1EB2KJUSOIPALLMNMVFZYIB3FJ20RT5WRC3G2XYSC',
+        v: '20180323',
+        ll: `${coords.lat},${coords.long}`,
+        query: 'coffee'
+    }
+    const queryString = formatQueryParams(params);
+    const url = endPoint + '?' + queryString;
 
-    const lat = coords.lat;
-    const long = coords.long;
-
-    const url = `https://developers.zomato.com/api/v2.1/search?lat=${lat}&lon=${long}&radius=8000&establishment_type=286`;
-    const apiKey = 'bf3a734186bb3b42c6dfa0df0eb323f5';
-    const options =  {
-        headers: new Headers({
-            'user-key': apiKey
-        })
-    };
-
-    fetch(url, options)
+    fetch(url)
         .then(response => response.json())
         .then(responseJson => renderCafes(responseJson));
 }
 
-function handleGeolocationSearch() {
-    console.log('handleGeolocationSearch ran');
+function fetchUserLocation() {
     if ('geolocation' in navigator) {
         console.log('geolocation in navigator');
+
         navigator.geolocation.getCurrentPosition(position => {
             const coords = {
                 lat: position.coords.latitude,
@@ -53,51 +54,11 @@ function handleGeolocationSearch() {
     }
 }
 
-function convertToLatLong(responseJson) {
-    console.log('convertToLatLong ran');
-    const coords = {
-        lat: responseJson.results[0].geometry.location.lat,
-        long: responseJson.results[0].geometry.location.lng
-    }
-    fetchCafes(coords);
-}
-
-function fetchLocation(location) {
-    console.log('fetchLocation ran');
-
-    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${location}&key=AIzaSyAkVfjrsbDT63PPJiJ10m3lNEiEy6Yjhao`;
-
-    fetch(url)
-        .then(response => response.json())
-        .then(responseJson => convertToLatLong(responseJson));
-}
-
-function handleLocationSearch() {
-    console.log('handleLocationSearch ran');
-
-    let location = $('.cafe-search__input').val();
-    console.log(location);
-    fetchLocation(location);
-}
-
-function submitClickListener() {
-    console.log('submitClickListener ran');
-
-    $('.cafe-search__location-form').submit(event => {
-        console.log('click location');
-        event.preventDefault();
-        handleLocationSearch();
-    })
-
+function handleUserSearch() {
     $('.cafe-search__geolocation-form').submit(event => {
-        console.log('click geolocation');
         event.preventDefault();
-        handleGeolocationSearch();
+        fetchUserLocation();
     })
 }
 
-function runApp() {
-    submitClickListener();
-}
-
-$(runApp);
+$(handleUserSearch);

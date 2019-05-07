@@ -9,4 +9,7 @@
     list-style: none;
     border: 1px solid black;
     margin: 5px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
 }
