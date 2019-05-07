@@ -1,6 +1,8 @@
 .search-results__list {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
+    padding: 0;
 }
 
 .list-item {
@@ -8,8 +10,26 @@
     width: 200px;
     list-style: none;
     border: 1px solid black;
-    margin: 5px;
+    margin: 10px;
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
+}
+
+.header {
+    text-align: center;
+}
+
+.cafe-search {
+    text-align: center;
+}
+
+.map-hidden {
+    display: none;
+}
+
+#map {
+    width: 800px;
+    height: 300px;
+    margin: 0 auto;
 }

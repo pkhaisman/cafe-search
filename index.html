@@ -8,9 +8,13 @@
     </head>
 
     <body>
-        <header>
+        <header class="header">
             <h1>Cafe Search</h1>
         </header>
+
+        <section id="map" class=""></section>
+        <div id="info_div"></div>
+
 
         <section class="cafe-search cafe-search-hidden">
             <form class="cafe-search__geolocation-form">
@@ -26,6 +30,10 @@
     <script
         src="https://code.jquery.com/jquery-3.4.1.min.js"
         integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
-        crossorigin="anonymous"></script>
+        crossorigin="anonymous">
+    </script>
     <script src="scripts.js"></script>
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAkVfjrsbDT63PPJiJ10m3lNEiEy6Yjhao">
+    </script>
 </html>
