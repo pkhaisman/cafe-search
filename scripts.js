@@ -105,8 +105,7 @@ function fetchCafes(coords) {
         client_secret: '4BGOSAW1EB2KJUSOIPALLMNMVFZYIB3FJ20RT5WRC3G2XYSC',
         v: '20180323',
         ll: `${coords.lat},${coords.lng}`,
-        query: 'coffee',
-        limit: 1
+        query: 'coffee'
     }
     const queryString = formatQueryParams(params);
     const url = endPoint + '?' + queryString;
