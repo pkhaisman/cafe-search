@@ -1,3 +1,12 @@
+.header {
+    text-align: center;
+}
+
+.main-content {
+    width: 66%;
+    margin: 20px auto;
+}
+
 .search-results__list {
     display: flex;
     flex-wrap: wrap;
@@ -5,31 +14,22 @@
     padding: 0;
 }
 
-.list-item {
-    height: 200px;
-    width: 200px;
+.search-results__list-item {
+    height: auto;
+    width: 100%;
     list-style: none;
     border: 1px solid black;
     margin: 10px;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
 }
 
-.header {
-    text-align: center;
-}
-
-.cafe-search {
-    text-align: center;
-}
-
-.map-hidden {
-    display: none;
+.search-results__list-item__img {
+    float: right;
 }
 
 #map {
-    width: 800px;
     height: 300px;
-    margin: 0 auto;
+}
+
+.hidden {
+    display: none;
 }
