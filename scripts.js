@@ -35,7 +35,7 @@ function initMap(coords, cafes) {
 
     let map = new google.maps.Map(document.getElementById('map'), {
         center: coords,
-        zoom: 14
+        zoom: 12
     });
 
     $('#map').addClass('map--style');
@@ -105,7 +105,8 @@ function fetchCafes(coords) {
         client_secret: '4BGOSAW1EB2KJUSOIPALLMNMVFZYIB3FJ20RT5WRC3G2XYSC',
         v: '20180323',
         ll: `${coords.lat},${coords.lng}`,
-        query: 'coffee'
+        query: 'coffee',
+        limit: 2
     }
     const queryString = formatQueryParams(params);
     const url = endPoint + '?' + queryString;
