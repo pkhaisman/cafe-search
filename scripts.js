@@ -1,33 +1,43 @@
 'use-strict';
 
-function fetchCafeInfo(cafeId) {
-    console.log('fetchCafeInfo ran');
-   
-    const endPoint = `https://api.foursquare.com/v2/venues/${cafeId}`;
-    const params = {
-        client_id: 'UVNI2LYVJN3GTR54P55RXNVXM3FQGOJCULNOF1QWPGSTW31F',
-        client_secret: '4BGOSAW1EB2KJUSOIPALLMNMVFZYIB3FJ20RT5WRC3G2XYSC',
-        v: '20180323',
-    }
-    const queryString = formatQueryParams(params);
-    const url = endPoint + '?' + queryString;
-
-    fetch(url)
-        .then(response => response.json())
-        .then(responseJson => {
-            renderCafe(responseJson);
-        });
-}
-
 function handleCafeInfoQuery() {
-    // add click listener
     $('.search-results__list').on('click', '.search-results__list-item', () => {
-        // show more info
         $(event.target)
             .parent()
             .children('.search-results__list-item__info')
             .toggleClass('hidden');
     })
+}
+
+function markCafe(cafe) {
+    let marker = new google.maps.Marker({
+        position: {
+            lat: cafe.venue.location.lat,
+            lng: cafe.venue.location.lng
+        },
+        title: cafe.venue.name,
+    });
+
+    return marker;
+}
+
+function attachMsg(marker) {
+    var infowindow = new google.maps.InfoWindow({
+        content: 'message'
+    });
+
+    marker.addListener('click', function() {
+        console.log('click');
+        infowindow.open(marker.get('map'), marker);
+    });
+}
+
+function renderMapMarkers(cafes, map) {
+    cafes.response.groups[0].items.forEach(cafe => {
+        let marker = markCafe(cafe);
+        marker.setMap(map);
+        attachMsg(marker);
+    });
 }
 
 function initMap(coords, cafes) {
@@ -40,18 +50,7 @@ function initMap(coords, cafes) {
 
     $('#map').addClass('map--style');
 
-    function markCafe(cafe) {
-        let marker = new google.maps.Marker({
-            map: map,
-            position: {
-                lat: cafe.venue.location.lat,
-                lng: cafe.venue.location.lng
-            },
-            title: cafe.venue.name
-        });
-    }
-
-    cafes.response.groups[0].items.forEach(cafe => markCafe(cafe));
+    renderMapMarkers(cafes, map);
 }
 
 function formatCafePicUrl(cafe) {
@@ -66,10 +65,9 @@ function formatCafePicUrl(cafe) {
 
 function formatCafe(cafe) {
     console.log('formatCafe ran');
-    console.log(cafe);
 
     return `
-        <li class="search-results__list-item">
+        <li id="bar" class="search-results__list-item">
             ${cafe.response.venue.name}
             <button class="search-results__list-item__btn">More Info</button>
             <img class="search-results__list-item__img" src="${formatCafePicUrl(cafe)}" alt="Image of ${cafe.response.venue.name}">
@@ -88,12 +86,55 @@ function renderCafe(cafe) {
     $('.search-results__list').append(formatCafe(cafe));
 }
 
+function formatHardCodedCafes() {
+    return `
+        <li id="0" class="search-results__list-item">
+            Cafe Name 1
+        </li>
+    `;
+}
+
+function renderHardCodedCafes() {
+    $('.search-results__list').append(formatHardCodedCafes());
+}
+
+function fetchCafeInfo(cafeId) {
+    console.log('fetchCafeInfo ran');
+   
+    const endPoint = `https://api.foursquare.com/v2/venues/${cafeId}`;
+    const params = {
+        client_id: 'UVNI2LYVJN3GTR54P55RXNVXM3FQGOJCULNOF1QWPGSTW31F',
+        client_secret: '4BGOSAW1EB2KJUSOIPALLMNMVFZYIB3FJ20RT5WRC3G2XYSC',
+        v: '20180323',
+    }
+    const queryString = formatQueryParams(params);
+    const url = endPoint + '?' + queryString;
+
+    fetch(url)
+        .then(handleError)
+        .then(response => response.json())
+        .then(responseJson => {
+            renderCafe(responseJson);
+        })
+        .catch(error => {
+            console.log('there was an error');
+            renderHardCodedCafes();
+        })
+}
+
 function formatQueryParams(params) {
     console.log('formatQueryParams ran');
 
     const queryItems = Object.keys(params)
         .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
     return queryItems.join('&');
+}
+
+function handleError(response) {
+    if (!response.ok) {
+        throw Error(response.statusText);
+    }
+    return response;
 }
 
 function fetchCafes(coords) {
@@ -112,15 +153,16 @@ function fetchCafes(coords) {
     const url = endPoint + '?' + queryString;
 
     fetch(url)
+        .then(handleError)
         .then(response => response.json())
         .then(responseJson => {
-            initMap(coords, responseJson);
-            
-            // for each cafe in cafesObj, get the cafe info
-            // consider separating into a function
             responseJson.response.groups[0].items.forEach(cafe => {
                 fetchCafeInfo(cafe.venue.id);
             });
+            initMap(coords, responseJson);
+        })
+        .catch(error => {
+            console.log('there was a fetch error in fetching cafes near me');
         });
 }
 
