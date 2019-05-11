@@ -1,3 +1,3 @@
 # cafe-search
 
-live version: 
+live version: https://pkhaisman.github.io/cafe-search/
