@@ -26,18 +26,22 @@ function attachMsg(marker) {
         content: 'message'
     });
 
-    marker.addListener('click', function() {
-        console.log('click');
+    // marker.addListener('click', function() {
+        // console.log('click');
         infowindow.open(marker.get('map'), marker);
-    });
+    // });
 }
 
 function renderMapMarkers(cafes, map) {
     cafes.response.groups[0].items.forEach(cafe => {
         let marker = markCafe(cafe);
         marker.setMap(map);
-        attachMsg(marker);
+        $('.search-results__list').on('click', '.search-results__list-item', () => {
+            console.log('click');
+            attachMsg(marker);
+        })
     });
+    
 }
 
 function initMap(coords, cafes) {
@@ -47,8 +51,6 @@ function initMap(coords, cafes) {
         center: coords,
         zoom: 12
     });
-
-    $('#map').addClass('map--style');
 
     renderMapMarkers(cafes, map);
 }
