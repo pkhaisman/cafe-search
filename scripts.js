@@ -119,7 +119,7 @@ function fetchCafeInfo(cafeId) {
             renderCafe(responseJson);
         })
         .catch(error => {
-            console.log('there was an error');
+            alert('There was an error in accessing cafe information. Rendering hard coded results instead.');
             renderHardCodedCafes();
         })
 }
@@ -164,7 +164,7 @@ function fetchCafes(coords) {
             initMap(coords, responseJson);
         })
         .catch(error => {
-            console.log('there was a fetch error in fetching cafes near me');
+            alert('There was an error in accessing cafes near you. Please try again later.');
         });
 }
 
@@ -182,7 +182,7 @@ function fetchUserLocation() {
             fetchCafes(coords);
         });
     } else {
-        console.log('prompt user to input location');
+        alert('There was an error in determining your location');
     }
 }
 
