@@ -1,5 +1,7 @@
 'use-strict';
 
+let counter = 0;
+
 function handleCafeInfoQuery() {
     $('.search-results__list').on('click', '.search-results__list-item', () => {
         $(event.target)
@@ -21,24 +23,24 @@ function markCafe(cafe) {
     return marker;
 }
 
-function attachMsg(marker) {
-    var infowindow = new google.maps.InfoWindow({
-        content: 'message'
+function showMarker(cafe, map, infoWindow) {
+    infoWindow.setContent(`${cafe.venue.name}`)
+    infoWindow.setPosition({
+        lat: cafe.venue.location.lat,
+        lng: cafe.venue.location.lng
     });
-
-    // marker.addListener('click', function() {
-        // console.log('click');
-        infowindow.open(marker.get('map'), marker);
-    // });
+    infoWindow.open(map);
 }
 
-function renderMapMarkers(cafes, map) {
+function renderMapMarkers(cafes, map, infoWindow) {
     cafes.response.groups[0].items.forEach(cafe => {
+        console.log(cafe);
         let marker = markCafe(cafe);
         marker.setMap(map);
-        $('.search-results__list').on('click', '.search-results__list-item', () => {
-            console.log('click');
-            attachMsg(marker);
+
+        marker.addListener('click', () => {
+            console.log('click marker');
+            showMarker(cafe, map, infoWindow);
         })
     });
     
@@ -52,7 +54,9 @@ function initMap(coords, cafes) {
         zoom: 12
     });
 
-    renderMapMarkers(cafes, map);
+    let infoWindow = new google.maps.InfoWindow({});
+
+    renderMapMarkers(cafes, map, infoWindow);
 }
 
 function formatCafePicUrl(cafe) {
@@ -68,8 +72,10 @@ function formatCafePicUrl(cafe) {
 function formatCafe(cafe) {
     console.log('formatCafe ran');
 
+    counter++;
+
     return `
-        <li id="bar" class="search-results__list-item">
+        <li id=${counter - 1} class="search-results__list-item">
             ${cafe.response.venue.name}
             <button class="search-results__list-item__btn">More Info</button>
             <img class="search-results__list-item__img" src="${formatCafePicUrl(cafe)}" alt="Image of ${cafe.response.venue.name}">
@@ -90,7 +96,7 @@ function renderCafe(cafe) {
 
 function formatHardCodedCafes() {
     return `
-        <li id="0" class="search-results__list-item">
+        <li class="search-results__list-item">
             Cafe Name 1
         </li>
     `;
