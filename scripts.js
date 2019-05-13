@@ -1,9 +1,8 @@
 'use-strict';
 
 function handleCafeInfoQuery() {
-    $('.search-results__list').on('click', '.search-results__list-item', () => {
+    $('.search-results__list').on('click', () => {
         $(event.target)
-            .parent()
             .children('.search-results__list-item__info')
             .toggleClass('hidden');
     })
@@ -31,7 +30,7 @@ function showInfoWindow(cafe, map, infoWindow) {
 }
 
 function renderMapMarkers(cafes, map, infoWindow) {
-    $('.search-results__list').on('click', '.search-results__list-item', () => {
+    $('.search-results__list').on('mouseenter mouseleave', '.search-results__list-item', () => {
         let cafe = null;
         let cafesArr = cafes.response.groups[0].items;
         let venueId = $(event.target).attr('id');
@@ -46,7 +45,6 @@ function renderMapMarkers(cafes, map, infoWindow) {
     })
 
     cafes.response.groups[0].items.forEach(cafe => {
-        console.log(cafe);
         let marker = markCafe(cafe);
         marker.setMap(map);
 
@@ -86,14 +84,15 @@ function formatCafe(cafe) {
 
     return `
         <li id="${cafe.response.venue.id}" class="search-results__list-item">
-            ${cafe.response.venue.name}
-            <button class="search-results__list-item__btn">More Info</button>
-            <img class="search-results__list-item__img" src="${formatCafePicUrl(cafe)}" alt="Image of ${cafe.response.venue.name}">
-            <ul class="search-results__list-item__info hidden">
-                <li>Rating: ${cafe.response.venue.rating}</li>
-                <li>City: ${cafe.response.venue.location.city}</li>
-                <li>Price: ${cafe.response.venue.price.message}</li>
-            </ul>
+            <div>
+                ${cafe.response.venue.name}
+                <img class="search-results__list-item__img" src="${formatCafePicUrl(cafe)}" alt="Image of ${cafe.response.venue.name}">
+                <ul class="search-results__list-item__info hidden">
+                    <li>Rating: ${cafe.response.venue.rating}</li>
+                    <li>City: ${cafe.response.venue.location.city}</li>
+                    <li>Price: ${cafe.response.venue.price.message}</li>
+                </ul>
+            </div>
         </li>
     `;
 }
@@ -107,7 +106,15 @@ function renderCafe(cafe) {
 function formatHardCodedCafes() {
     return `
         <li class="search-results__list-item">
-            Cafe Name 1
+            <div>
+                Cafe Name
+                <img class="search-results__list-item__img" src="#" alt="Image of 'Cafe Name'">
+                <ul class="search-results__list-item__info hidden">
+                    <li>Rating: rating</li>
+                    <li>City: city</li>
+                    <li>Price: price</li>
+                </ul>
+            </div>
         </li>
     `;
 }
