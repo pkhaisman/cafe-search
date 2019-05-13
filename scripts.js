@@ -47,7 +47,6 @@ function renderMapMarkers(cafes, map, infoWindow) {
     cafes.response.groups[0].items.forEach(cafe => {
         let marker = markCafe(cafe);
         marker.setMap(map);
-
         marker.addListener('click', () => {
             console.log('click marker');
             showInfoWindow(cafe, map, infoWindow);
@@ -61,11 +60,9 @@ function initMap(coords, cafes) {
 
     let map = new google.maps.Map(document.getElementById('map'), {
         center: coords,
-        zoom: 12
+        zoom: 13
     });
-
     let infoWindow = new google.maps.InfoWindow({});
-
     renderMapMarkers(cafes, map, infoWindow);
 }
 
@@ -143,6 +140,7 @@ function fetchCafeInfo(cafeId) {
         })
         .catch(error => {
             alert('There was an error in accessing cafe information. Rendering hard coded results instead.');
+            console.log(error);
             renderHardCodedCafes();
         })
 }
@@ -188,20 +186,31 @@ function fetchCafes(coords) {
         })
         .catch(error => {
             alert('There was an error in accessing cafes near you. Please try again later.');
+            console.log(error);
         });
+}
+
+function scrollToResults() {
+    $('.main-content')
+    .removeClass('hidden')
+    .addClass('main-content--set-height');
+
+    window.scrollBy({
+        top: window.innerHeight,
+        behavior: 'smooth'
+    });
 }
 
 function fetchUserLocation() {
     console.log('fetchUserLocation ran');
 
     if ('geolocation' in navigator) {
-        console.log('geolocation in navigator');
-
         navigator.geolocation.getCurrentPosition(position => {
             const coords = {
                 lat: position.coords.latitude,
                 lng: position.coords.longitude
             }        
+            scrollToResults();
             fetchCafes(coords);
         });
     } else {
