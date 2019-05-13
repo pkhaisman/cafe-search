@@ -1,7 +1,5 @@
 'use-strict';
 
-let counter = 0;
-
 function handleCafeInfoQuery() {
     $('.search-results__list').on('click', '.search-results__list-item', () => {
         $(event.target)
@@ -23,7 +21,7 @@ function markCafe(cafe) {
     return marker;
 }
 
-function showMarker(cafe, map, infoWindow) {
+function showInfoWindow(cafe, map, infoWindow) {
     infoWindow.setContent(`${cafe.venue.name}`)
     infoWindow.setPosition({
         lat: cafe.venue.location.lat,
@@ -33,6 +31,20 @@ function showMarker(cafe, map, infoWindow) {
 }
 
 function renderMapMarkers(cafes, map, infoWindow) {
+    $('.search-results__list').on('click', '.search-results__list-item', () => {
+        let cafe = null;
+        let cafesArr = cafes.response.groups[0].items;
+        let venueId = $(event.target).attr('id');
+
+        for (let i = 0; i < cafesArr.length; i++) {
+            if (venueId === cafesArr[i].venue.id) {
+                cafe = cafesArr[i];
+                showInfoWindow(cafe, map, infoWindow);
+                break;
+            } 
+        }
+    })
+
     cafes.response.groups[0].items.forEach(cafe => {
         console.log(cafe);
         let marker = markCafe(cafe);
@@ -40,7 +52,7 @@ function renderMapMarkers(cafes, map, infoWindow) {
 
         marker.addListener('click', () => {
             console.log('click marker');
-            showMarker(cafe, map, infoWindow);
+            showInfoWindow(cafe, map, infoWindow);
         })
     });
     
@@ -72,10 +84,8 @@ function formatCafePicUrl(cafe) {
 function formatCafe(cafe) {
     console.log('formatCafe ran');
 
-    counter++;
-
     return `
-        <li id=${counter - 1} class="search-results__list-item">
+        <li id="${cafe.response.venue.id}" class="search-results__list-item">
             ${cafe.response.venue.name}
             <button class="search-results__list-item__btn">More Info</button>
             <img class="search-results__list-item__img" src="${formatCafePicUrl(cafe)}" alt="Image of ${cafe.response.venue.name}">
