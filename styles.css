@@ -53,20 +53,33 @@
 }
 
 .search-results__list-item {
-    height: 50px;
+    display: flex;
+    height: auto;
     width: 100%;
     list-style: none;
     border-bottom: 1px solid #d8d8d8;
     padding: 5px;
 }
 
-.search-results__list-item--hover-effect {
+/* .search-results__list-item--hover-effect {
     background-color: #f9f9f9;
     cursor: pointer;
+} */
+
+.search-results__list-item__name-rating {
+    display: flex;
+}
+
+.search-results__list-item__info {
+    margin: 0;
+    margin-left: 20px;
+    color: grey;
 }
 
 .search-results__list-item__img {
-    float: right;
+    width: 100px;
+    height: 100px;
+    background-color: #d8d8d8;
 }
 
 #map {

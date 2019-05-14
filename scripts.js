@@ -52,7 +52,6 @@ function renderMapMarkers(cafes, map, infoWindow) {
             showInfoWindow(cafe, map, infoWindow);
         })
     });
-    
 }
 
 function initMap(coords, cafes) {
@@ -76,6 +75,14 @@ function formatCafePicUrl(cafe) {
     return url;
 }
 
+function displayCafeInfo(info) {
+    if (info) {
+        return info;
+    } else {
+        return 'Data not found';
+    }
+}
+
 function formatCafe(cafe) {
     console.log('formatCafe ran');
 
@@ -83,11 +90,13 @@ function formatCafe(cafe) {
         <li id="${cafe.response.venue.id}" class="search-results__list-item">
             <div>
                 ${cafe.response.venue.name}
-                <img class="search-results__list-item__img" src="${formatCafePicUrl(cafe)}" alt="Image of ${cafe.response.venue.name}">
-                <ul class="search-results__list-item__info hidden">
-                    <li>Rating: ${cafe.response.venue.rating}</li>
-                    <li>City: ${cafe.response.venue.location.city}</li>
-                    <li>Price: ${cafe.response.venue.price.message}</li>
+                <img class="search-results__list-item__img" src="#" alt="Image of ${cafe.response.venue.name}">
+                <ul class="search-results__list-item__info">
+                    <li>Hours: ${displayCafeInfo(cafe.response.venue.hours.status)}</li>
+                    <li>Address: ${displayCafeInfo(cafe.response.venue.location.address)}</li>
+                    <li>Website: ${displayCafeInfo(cafe.response.venue.url)}</li>
+                    <li>Rating: ${displayCafeInfo(cafe.response.venue.rating)}</li>
+                    <li>Reviews: ${displayCafeInfo(cafe.response.venue.ratingSignals)}</li>
                 </ul>
             </div>
         </li>
@@ -96,21 +105,29 @@ function formatCafe(cafe) {
 
 function renderCafe(cafe) {
     console.log('renderCafes ran');
+    console.log(cafe);
 
     $('.search-results__list').append(formatCafe(cafe));
 }
 
 function formatHardCodedCafes() {
     return `
-        <li class="search-results__list-item">
+        <li id="12345" class="search-results__list-item">
             <div>
-                Cafe Name
-                <img class="search-results__list-item__img" src="#" alt="Image of 'Cafe Name'">
-                <ul class="search-results__list-item__info hidden">
-                    <li>Rating: rating</li>
-                    <li>City: city</li>
-                    <li>Price: price</li>
-                </ul>
+                <div class="search-results__list-item__name-rating">
+                    <p>Cafe Name</p>
+                    <p>8.9 stars (86)</p>
+                </div>
+                <div>
+                    <p class="search-results__list-item__info">123 Main Street</p>
+                    <p class="search-results__list-item__info">Open until 6:00 PM</p>
+                    <p class="search-results__list-item__info"><a>www.cafename.com</a></p>
+                </div>
+            </div>
+            <div>
+                <div>
+                    <img class="search-results__list-item__img" src="#" alt="Image of Cafe Name">
+                </div>
             </div>
         </li>
     `;
