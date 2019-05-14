@@ -1,13 +1,5 @@
 'use-strict';
 
-function handleCafeInfoQuery() {
-    $('.search-results__list').on('click', () => {
-        $(event.target)
-            .children('.search-results__list-item__info')
-            .toggleClass('hidden');
-    })
-}
-
 function markCafe(cafe) {
     let marker = new google.maps.Marker({
         position: {
@@ -31,6 +23,10 @@ function showInfoWindow(cafe, map, infoWindow) {
 
 function renderMapMarkers(cafes, map, infoWindow) {
     $('.search-results__list').on('mouseenter mouseleave', '.search-results__list-item', () => {
+        $(event.target)
+            .closest('.search-results__list-item')
+            .toggleClass('hover-styles');
+
         let cafe = null;
         let cafesArr = cafes.response.groups[0].items;
         let venueId = $(event.target).attr('id');
@@ -110,31 +106,32 @@ function renderCafe(cafe) {
     $('.search-results__list').append(formatCafe(cafe));
 }
 
-function formatHardCodedCafes() {
+function formatCafeAlt(cafe) {
     return `
-        <li id="12345" class="search-results__list-item">
+        <li id="${cafe.venue.id}" class="search-results__list-item">
             <div>
                 <div class="search-results__list-item__name-rating">
-                    <p>Cafe Name</p>
+                    <p>${cafe.venue.name}</p>
                     <p>8.9 stars (86)</p>
                 </div>
                 <div>
-                    <p class="search-results__list-item__info">123 Main Street</p>
+                    <p class="search-results__list-item__info">${cafe.venue.location.address}</p>
                     <p class="search-results__list-item__info">Open until 6:00 PM</p>
-                    <p class="search-results__list-item__info"><a>www.cafename.com</a></p>
+                    <p class="search-results__list-item__info"><a href="3">Website</a></p>
                 </div>
             </div>
             <div>
                 <div>
-                    <img class="search-results__list-item__img" src="#" alt="Image of Cafe Name">
+                    <img class="search-results__list-item__img" src="#" alt="Image of ${cafe.venue.name}">
                 </div>
             </div>
         </li>
     `;
 }
 
-function renderHardCodedCafes() {
-    $('.search-results__list').append(formatHardCodedCafes());
+function renderCafeAlt(cafe) {
+    console.log('renderCafeAlt ran');
+    $('.search-results__list').append(formatCafeAlt(cafe));
 }
 
 function fetchCafeInfo(cafeId) {
@@ -156,9 +153,7 @@ function fetchCafeInfo(cafeId) {
             renderCafe(responseJson);
         })
         .catch(error => {
-            alert('There was an error in accessing cafe information. Rendering hard coded results instead.');
-            console.log(error);
-            renderHardCodedCafes();
+            alert('There was an error in accessing cafe information.');
         })
 }
 
@@ -187,7 +182,7 @@ function fetchCafes(coords) {
         v: '20180323',
         ll: `${coords.lat},${coords.lng}`,
         query: 'coffee',
-        limit: 2
+        limit: 20
     }
     const queryString = formatQueryParams(params);
     const url = endPoint + '?' + queryString;
@@ -196,14 +191,15 @@ function fetchCafes(coords) {
         .then(handleError)
         .then(response => response.json())
         .then(responseJson => {
+            console.log(responseJson);
             responseJson.response.groups[0].items.forEach(cafe => {
-                fetchCafeInfo(cafe.venue.id);
+                renderCafeAlt(cafe);
+                // fetchCafeInfo(cafe.venue.id);
             });
             initMap(coords, responseJson);
         })
         .catch(error => {
             alert('There was an error in accessing cafes near you. Please try again later.');
-            console.log(error);
         });
 }
 
@@ -235,18 +231,55 @@ function fetchUserLocation() {
     }
 }
 
-function handleUserSearch() {
+function fetchUserCoords(userInput) {
+    console.log('fetchUserCoords ran');
+
+    const endPoint = 'https://maps.googleapis.com/maps/api/geocode/json'
+    const params = {
+        key: 'AIzaSyAkVfjrsbDT63PPJiJ10m3lNEiEy6Yjhao',
+        address: userInput.split(' ').join('+'),
+    }
+    const queryString = formatQueryParams(params);
+    const url = endPoint + '?' + queryString;
+
+    fetch(url)
+        .then(handleError)
+        .then(response => response.json())
+        .then(responseJson => {
+            const coords = {
+                lat: responseJson.results[0].geometry.location.lat,
+                lng: responseJson.results[0].geometry.location.lng 
+            }
+            scrollToResults();
+            fetchCafes(coords);
+        })
+        .catch(error => {
+            alert('There was an error in getting coordinates');
+        });
+}
+
+function handleUserSearchByLocationInput() {
+    console.log('search by user input');
+
+    $('.js-user-input').click(event => {
+        event.preventDefault();
+        let userInput = $('input').val();
+        fetchUserCoords(userInput);
+    })
+}
+
+function handleUserSearchByGeolocation() {
     console.log('handleUserSearch ran');
 
-    $('.header__btn').click(event => {
+    $('.js-geolocation').click(event => {
         event.preventDefault();
         fetchUserLocation();
     })
 }
 
 function renderApp() {
-    handleUserSearch();
-    handleCafeInfoQuery();
+    handleUserSearchByGeolocation();
+    handleUserSearchByLocationInput();
 }
 
 $(renderApp);
