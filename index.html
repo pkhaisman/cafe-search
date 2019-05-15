@@ -11,14 +11,16 @@
     <body>
         <header class="header">
             <div class="header__container">
-                <img src="https://img.icons8.com/cotton/64/000000/cafe.png">
-                <h1 class="header__title">Cafes Near Me</h1>
-                <button class="header__btn js-geolocation">Search</button>
-                <form>
-                    <label for="search">Search by location: </label>
-                    <input type="text" id="search">
-                    <button class="header__btn js-user-input" type="submit">Search</button>
-                </form>
+                <h1 class="header__title">Find Cafes</h1>
+                <img src="./cafe-icon.png">
+                <div class="header__btn-container flex-container">
+                    <button class="header__btn header__btn__input" type="submit">Where are you?</button>
+                    <form class="header__form hidden">
+                        <input class="header__form__input" type="text" id="search">
+                        <button class="header__form__btn header__btn js-user-input" type="submit">Search</button>
+                    </form>
+                    <button class="header__btn js-geolocation">Use current location</button>
+                </div>
             </div>
         </header>
 

@@ -1,3 +1,11 @@
+* {
+    box-sizing: border-box;
+}
+
+p {
+    margin: 0;
+}
+
 .header {
     text-align: center;
     height: 100vh;
@@ -13,31 +21,60 @@
     background-size: cover;
     background-position: center;
     display: flex;
+    flex-direction: column;
     justify-content: center;
 }
 
 .header__container {
     align-self: center;
+    padding: 32px;
+    background-color: rgba(165, 165, 165, .75);
+    border-radius: 5px;
+    width: 250px;
 }
 
 .header__title {
     margin: 0;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
     color: white;
+}
+
+.header__form__input {
+    padding: 10px;
+    height: 36px;
+    border: none;
+    border-radius: 5px;
+    float: left;
+    width: 100%;
+}
+
+.header__form__btn {
+    margin-top: 20px;
+    width: 100%;
+
 }
 
 .header__btn {
     color: white;
-    background-color: green;
+    background-color: #fc6950;
     border: none;
     padding: 10px 20px;
     border-radius: 5px;
-    margin-top: 10px;
+}
+
+.header__btn-container {
+    justify-content: center;
+    flex-direction: column;
+}
+
+.header__btn__input, .header__form {
+    height: auto;
+    margin: 20px 0 20px 0;
 }
 
 .header__btn:hover {
     cursor: pointer;
-    background-color: darkgreen;
+    background-color: #e05d47;
 }
 
 .main-content--set-height {
@@ -54,31 +91,36 @@
 
 .search-results__list-item {
     display: flex;
+    justify-content: space-between;
     height: auto;
     width: 100%;
     list-style: none;
     border-bottom: 1px solid #d8d8d8;
-    padding: 5px;
+    padding: 10px;
 }
 
 .hover-styles {
     background-color: #f9f9f9;
 }
 
+.search-results__list-item__info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
 .search-results__list-item__name-rating {
     display: flex;
+    margin-left: 20px;
 }
 
 .search-results__list-item__info {
     margin: 0;
-    margin-left: 20px;
-    color: grey;
 }
 
 .search-results__list-item__img {
-    width: 100px;
-    height: 100px;
     background-color: #d8d8d8;
+    margin-right: 20px;
 }
 
 #map {
@@ -92,4 +134,25 @@
 
 .hidden {
     display: none;
+}
+
+.flex-container {
+    display: flex;
+}
+
+@media only screen and (min-width: 800px) {
+    .header__container {
+        width: 400px;
+    }
+
+    #map {
+        height: 100vh;
+        width: 66%;
+        float: right;
+    }
+
+    .search-results__list {
+        width: 34%;
+        /* float: left; */
+    }
 }

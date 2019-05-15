@@ -21,7 +21,7 @@ function showInfoWindow(cafe, map, infoWindow) {
     infoWindow.open(map);
 }
 
-function renderMapMarkers(cafes, map, infoWindow) {
+function renderMapMarkers(cafes, map, infoWindow, coords) {
     $('.search-results__list').on('mouseenter mouseleave', '.search-results__list-item', () => {
         $(event.target)
             .closest('.search-results__list-item')
@@ -40,10 +40,25 @@ function renderMapMarkers(cafes, map, infoWindow) {
         }
     })
 
+    let userLocation = new google.maps.Marker({
+        position: coords,
+        title: 'My location',
+        icon: 'http://maps.google.com/mapfiles/kml/paddle/red-circle-lv.png'
+    });
+    userLocation.setMap(map);
+    userLocation.addListener('click', () => {
+        infoWindow.setContent('My location');
+        infoWindow.setPosition(coords);
+        infoWindow.open(map);
+    })
+
     cafes.response.groups[0].items.forEach(cafe => {
         let marker = markCafe(cafe);
         marker.setMap(map);
         marker.addListener('mouseover', () => {
+            showInfoWindow(cafe, map, infoWindow);
+        })
+        marker.addListener('click', () => {
             showInfoWindow(cafe, map, infoWindow);
         })
     });
@@ -52,10 +67,10 @@ function renderMapMarkers(cafes, map, infoWindow) {
 function initMap(coords, cafes) {
     let map = new google.maps.Map(document.getElementById('map'), {
         center: coords,
-        zoom: 13
+        zoom: 15
     });
     let infoWindow = new google.maps.InfoWindow({});
-    renderMapMarkers(cafes, map, infoWindow);
+    renderMapMarkers(cafes, map, infoWindow, coords);
 }
 
 function formatCafePicUrl(cafe) {
@@ -77,21 +92,15 @@ function renderCafe(cafe) {
     const cafeData = cafe.response.venue;
     $('.search-results__list').append(`
         <li id="${displayCafeInfo(cafeData.id)}" class="search-results__list-item">
-            <div>
-                <div class="search-results__list-item__name-rating">
-                    <p>${displayCafeInfo(cafeData.name)}</p>
-                    <p>${displayCafeInfo(cafeData.rating)}/10 (${displayCafeInfo(cafeData.ratingSignals)})</p>
-                </div>
-                <div>
-                    <p class="search-results__list-item__info">${displayCafeInfo(cafeData.location.address)}</p>
-                    <p class="search-results__list-item__info">${displayCafeInfo(cafeData.hours.status)}</p>
-                    <p class="search-results__list-item__info"><a href="${displayCafeInfo(cafeData.url)}">Website</a></p>
-                </div>
+            <div class="search-results__list-item__info">
+                <p>${displayCafeInfo(cafeData.name)}</p>
+                <p>${displayCafeInfo(cafeData.rating)}/10 (${displayCafeInfo(cafeData.ratingSignals)})</p>
+                <p>${displayCafeInfo(cafeData.location.address)}</p>
+                <p>${displayCafeInfo(cafeData.hours.status)}</p>
+                <p><a href="${displayCafeInfo(cafeData.url)}">Website</a></p>
             </div>
-            <div>
-                <div>
-                    <img class="search-results__list-item__img" src="${formatCafePicUrl(cafe)}" alt="Image of ${cafeData.name}">
-                </div>
+            <div>                
+                <img class="search-results__list-item__img" src="${formatCafePicUrl(cafe)}" alt="Image of ${cafeData.name}">
             </div>
         </li>
     `);
@@ -100,18 +109,12 @@ function renderCafe(cafe) {
 function renderCafeAlt(cafe) {
     $('.search-results__list').append(`
         <li id="${cafe.venue.id}" class="search-results__list-item">
-            <div>
-                <div class="search-results__list-item__name-rating">
-                    <p>${cafe.venue.name}</p>
-                </div>
-                <div>
-                    <p class="search-results__list-item__info">${cafe.venue.location.address}</p>
-                </div>
+            <div class="search-results__list-item__info">
+                <p>${cafe.venue.name}</p>
+                <p>${cafe.venue.location.address}</p>
             </div>
-            <div>
-                <div>
-                    <img class="search-results__list-item__img" src="#" alt="Image of ${cafe.venue.name}">
-                </div>
+            <div>                
+                <img class="search-results__list-item__img" src="#" alt="Image of cafe">
             </div>
         </li>
     `);
@@ -160,7 +163,7 @@ function fetchCafes(coords) {
         v: '20180323',
         ll: `${coords.lat},${coords.lng}`,
         query: 'coffee',
-        limit: 2
+        limit: 10
     }
     const queryString = formatQueryParams(params);
     const url = endPoint + '?' + queryString;
@@ -247,9 +250,17 @@ function handleUserSearchByGeolocation() {
     })
 }
 
+function showUserForm() {
+    $('.header__btn__input').click(() => {
+        $('.header__btn__input').toggleClass('hidden');
+        $('.header__form').toggleClass('hidden');
+    })
+}
+
 function renderApp() {
     handleUserSearchByGeolocation();
     handleUserSearchByLocationInput();
+    showUserForm();
 }
 
 $(renderApp);
