@@ -13,7 +13,7 @@ function markCafe(cafe) {
 }
 
 function showInfoWindow(cafe, map, infoWindow) {
-    infoWindow.setContent(`${cafe.venue.name}`)
+    infoWindow.setContent(`${cafe.venue.name}`);
     infoWindow.setPosition({
         lat: cafe.venue.location.lat,
         lng: cafe.venue.location.lng
@@ -32,7 +32,7 @@ function markUserLocation(map, infoWindow, coords) {
         infoWindow.setContent('My location');
         infoWindow.setPosition(coords);
         infoWindow.open(map);
-    })
+    });
 }
 
 function highlighSelectionOnMap(cafes, map, infoWindow) {
@@ -53,7 +53,7 @@ function highlighSelectionOnMap(cafes, map, infoWindow) {
                 break;
             } 
         }
-    })
+    });
 }
 
 function addMarkerListeners(marker, cafe, map, infoWindow) {
@@ -70,12 +70,12 @@ function addMarkerListeners(marker, cafe, map, infoWindow) {
         removeClassHover();
         toggleClassHover();
         
-    })
+    });
     marker.addListener('click', () => {
         showInfoWindow(cafe, map, infoWindow);
         removeClassHover();
         toggleClassHover();
-    })
+    });
 }
 
 function renderMapMarkers(cafes, map, infoWindow, coords) {
@@ -85,7 +85,7 @@ function renderMapMarkers(cafes, map, infoWindow, coords) {
     cafes.response.groups[0].items.forEach(cafe => {
         let marker = markCafe(cafe);
         marker.setMap(map);
-        addMarkerListeners(marker, cafe, map, infoWindow)
+        addMarkerListeners(marker, cafe, map, infoWindow);
     });
 }
 
@@ -109,7 +109,6 @@ function formatCafePicUrl(cafe) {
 }
 
 function renderCafe(cafe) {
-    console.log(cafe);
     const cafeData = cafe.response.venue;
     $('.search-results__list').append(`
         <li id="${cafeData.id}" class="search-results__list-item">
@@ -127,28 +126,13 @@ function renderCafe(cafe) {
     `);
 }
 
-function renderCafeAlt(cafe) {
-    $('.search-results__list').append(`
-        <li id="${cafe.venue.id}" class="search-results__list-item">
-            <div class="search-results__list-item__info">
-                <h3>${cafe.venue.name}</h3>
-                <p>${cafe.venue.location.address}</p>
-                <button class="search-results__list-item__btn">Website</button>
-            </div>
-            <div>                
-                <img class="search-results__list-item__img" src="#" alt="Image of cafe">
-            </div>
-        </li>
-    `);
-}
-
 function fetchCafeInfo(cafeId) {
     const endPoint = `https://api.foursquare.com/v2/venues/${cafeId}`;
     const params = {
         client_id: 'UVNI2LYVJN3GTR54P55RXNVXM3FQGOJCULNOF1QWPGSTW31F',
         client_secret: '4BGOSAW1EB2KJUSOIPALLMNMVFZYIB3FJ20RT5WRC3G2XYSC',
         v: '20180323',
-    }
+    };
     const queryString = formatQueryParams(params);
     const url = endPoint + '?' + queryString;
 
@@ -160,12 +144,12 @@ function fetchCafeInfo(cafeId) {
         })
         .catch(error => {
             alert('There was an error in accessing cafe information. Please look at console for more info.');
-        })
+        });
 }
 
 function formatQueryParams(params) {
     const queryItems = Object.keys(params)
-        .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
+        .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`);
     return queryItems.join('&');
 }
 
@@ -177,7 +161,7 @@ function handleError(response) {
 }
 
 function fetchCafes(coords) {
-    const endPoint = 'https://api.foursquare.com/v2/venues/explore'
+    const endPoint = 'https://api.foursquare.com/v2/venues/explore';
     const params = {
         client_id: 'UVNI2LYVJN3GTR54P55RXNVXM3FQGOJCULNOF1QWPGSTW31F',
         client_secret: '4BGOSAW1EB2KJUSOIPALLMNMVFZYIB3FJ20RT5WRC3G2XYSC',
@@ -185,7 +169,7 @@ function fetchCafes(coords) {
         ll: `${coords.lat},${coords.lng}`,
         query: 'coffee',
         limit: 5
-    }
+    };
     const queryString = formatQueryParams(params);
     const url = endPoint + '?' + queryString;
 
@@ -194,7 +178,6 @@ function fetchCafes(coords) {
         .then(response => response.json())
         .then(responseJson => {
             responseJson.response.groups[0].items.forEach(cafe => {
-                // renderCafeAlt(cafe);
                 fetchCafeInfo(cafe.venue.id);
             });
             initMap(coords, responseJson);
