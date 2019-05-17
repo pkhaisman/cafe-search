@@ -43,15 +43,13 @@ function highlighSelectionOnMap(cafes, map, infoWindow) {
         $(event.target)
             .closest('.search-results__list-item')
             .toggleClass('hover-styles');
-    
-        let cafe = null;
+
         let cafesArr = cafes.response.groups[0].items;
         let venueId = $(event.target).closest('.search-results__list-item').attr('id');
-    
+
         for (let i = 0; i < cafesArr.length; i++) {
             if (venueId === cafesArr[i].venue.id) {
-                cafe = cafesArr[i];
-                showInfoWindow(cafe, map, infoWindow);
+                showInfoWindow(cafesArr[i], map, infoWindow);
                 break;
             } 
         }
@@ -186,7 +184,7 @@ function fetchCafes(coords) {
         v: '20180323',
         ll: `${coords.lat},${coords.lng}`,
         query: 'coffee',
-        limit: 2
+        limit: 5
     }
     const queryString = formatQueryParams(params);
     const url = endPoint + '?' + queryString;
@@ -196,8 +194,8 @@ function fetchCafes(coords) {
         .then(response => response.json())
         .then(responseJson => {
             responseJson.response.groups[0].items.forEach(cafe => {
-                renderCafeAlt(cafe);
-                // fetchCafeInfo(cafe.venue.id);
+                // renderCafeAlt(cafe);
+                fetchCafeInfo(cafe.venue.id);
             });
             initMap(coords, responseJson);
         })
