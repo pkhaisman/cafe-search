@@ -1,6 +1,6 @@
 # Cafes Near Me App
 
-Either manually input your location or use your devices' location to find cafes near you! Results will be rendered both in list and map view.
+Manually enter your location or use your devices' current location to find cafes near you! Results will be rendered both in list and map view.
 
 ## Live Version
 
