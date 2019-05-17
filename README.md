@@ -12,17 +12,9 @@ https://pkhaisman.github.io/cafe-search/
 
 ![Landing Page: Desktop view](https://raw.githubusercontent.com/pkhaisman/cafe-search/master/photos/landing-page.png)
 
-### Landing Page - Smart Phone
-
-![Landing Page: Smart Phone view](https://raw.githubusercontent.com/pkhaisman/cafe-search/master/photos/landing-page-smart-phone.png)
-
 ### Results Page - Desktop
 
 ![Results Page: Desktop view](https://raw.githubusercontent.com/pkhaisman/cafe-search/master/photos/results-page-desktop.png)
-
-### Results Page - Smart Phone
-
-![Results Page: Smartphone View](https://raw.githubusercontent.com/pkhaisman/cafe-search/master/photos/results-page-smart-phone.png)
 
 ## Built With
 
