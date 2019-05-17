@@ -21,25 +21,7 @@ function showInfoWindow(cafe, map, infoWindow) {
     infoWindow.open(map);
 }
 
-function renderMapMarkers(cafes, map, infoWindow, coords) {
-    $('.search-results__list').on('mouseenter mouseleave', '.search-results__list-item', () => {
-        $(event.target)
-            .closest('.search-results__list-item')
-            .toggleClass('hover-styles');
-
-        let cafe = null;
-        let cafesArr = cafes.response.groups[0].items;
-        let venueId = $(event.target).attr('id');
-
-        for (let i = 0; i < cafesArr.length; i++) {
-            if (venueId === cafesArr[i].venue.id) {
-                cafe = cafesArr[i];
-                showInfoWindow(cafe, map, infoWindow);
-                break;
-            } 
-        }
-    })
-
+function markUserLocation(map, infoWindow, coords) {
     let userLocation = new google.maps.Marker({
         position: coords,
         title: 'My location',
@@ -51,16 +33,61 @@ function renderMapMarkers(cafes, map, infoWindow, coords) {
         infoWindow.setPosition(coords);
         infoWindow.open(map);
     })
+}
+
+function highlighSelectionOnMap(cafes, map, infoWindow) {
+    $('.search-results__list').on('click mouseenter mouseleave', '.search-results__list-item', () => {
+        $('.search-results__list')
+            .children()
+            .removeClass('hover-styles');
+        $(event.target)
+            .closest('.search-results__list-item')
+            .toggleClass('hover-styles');
+    
+        let cafe = null;
+        let cafesArr = cafes.response.groups[0].items;
+        let venueId = $(event.target).closest('.search-results__list-item').attr('id');
+    
+        for (let i = 0; i < cafesArr.length; i++) {
+            if (venueId === cafesArr[i].venue.id) {
+                cafe = cafesArr[i];
+                showInfoWindow(cafe, map, infoWindow);
+                break;
+            } 
+        }
+    })
+}
+
+function addMarkerListeners(marker, cafe, map, infoWindow) {
+    function removeClassHover() {
+        return $('.search-results__list').children().removeClass('hover-styles'); 
+    }  
+
+    function toggleClassHover() {
+        return $('.search-results__list').children(`#${cafe.venue.id}`).toggleClass('hover-styles');
+    } 
+
+    marker.addListener('mouseover', () => {
+        showInfoWindow(cafe, map, infoWindow);
+        removeClassHover();
+        toggleClassHover();
+        
+    })
+    marker.addListener('click', () => {
+        showInfoWindow(cafe, map, infoWindow);
+        removeClassHover();
+        toggleClassHover();
+    })
+}
+
+function renderMapMarkers(cafes, map, infoWindow, coords) {
+    markUserLocation(map, infoWindow, coords);  
+    highlighSelectionOnMap(cafes, map, infoWindow);  
 
     cafes.response.groups[0].items.forEach(cafe => {
         let marker = markCafe(cafe);
         marker.setMap(map);
-        marker.addListener('mouseover', () => {
-            showInfoWindow(cafe, map, infoWindow);
-        })
-        marker.addListener('click', () => {
-            showInfoWindow(cafe, map, infoWindow);
-        })
+        addMarkerListeners(marker, cafe, map, infoWindow)
     });
 }
 
@@ -69,7 +96,9 @@ function initMap(coords, cafes) {
         center: coords,
         zoom: 15
     });
-    let infoWindow = new google.maps.InfoWindow({});
+    let infoWindow = new google.maps.InfoWindow({
+        maxWidth: 100
+    });
     renderMapMarkers(cafes, map, infoWindow, coords);
 }
 
@@ -81,23 +110,17 @@ function formatCafePicUrl(cafe) {
     return url;
 }
 
-function displayCafeInfo(info) {
-    if (info) {
-        return info;
-    }
-    return 'Data not found';
-}
-
 function renderCafe(cafe) {
+    console.log(cafe);
     const cafeData = cafe.response.venue;
     $('.search-results__list').append(`
-        <li id="${displayCafeInfo(cafeData.id)}" class="search-results__list-item">
+        <li id="${cafeData.id}" class="search-results__list-item">
             <div class="search-results__list-item__info">
-                <p>${displayCafeInfo(cafeData.name)}</p>
-                <p>${displayCafeInfo(cafeData.rating)}/10 (${displayCafeInfo(cafeData.ratingSignals)})</p>
-                <p>${displayCafeInfo(cafeData.location.address)}</p>
-                <p>${displayCafeInfo(cafeData.hours.status)}</p>
-                <p><a href="${displayCafeInfo(cafeData.url)}">Website</a></p>
+                <h3>${cafeData.name}</h3>
+                <p>${cafeData.rating}/10<i class="fas fa-star"></i>(${cafeData.ratingSignals})</p>
+                <p>${cafeData.location ? cafeData.location.address : '-'}</p>
+                <p>${cafeData.hours ? cafeData.hours.status : '-'}</p>    
+                <a href="${cafeData.url}" target="_blank"><button class="search-results__list-item__btn">Website</button></a>
             </div>
             <div>                
                 <img class="search-results__list-item__img" src="${formatCafePicUrl(cafe)}" alt="Image of ${cafeData.name}">
@@ -110,8 +133,9 @@ function renderCafeAlt(cafe) {
     $('.search-results__list').append(`
         <li id="${cafe.venue.id}" class="search-results__list-item">
             <div class="search-results__list-item__info">
-                <p>${cafe.venue.name}</p>
+                <h3>${cafe.venue.name}</h3>
                 <p>${cafe.venue.location.address}</p>
+                <button class="search-results__list-item__btn">Website</button>
             </div>
             <div>                
                 <img class="search-results__list-item__img" src="#" alt="Image of cafe">
@@ -137,8 +161,7 @@ function fetchCafeInfo(cafeId) {
             renderCafe(responseJson);
         })
         .catch(error => {
-            console.log('There was an error in accessing cafe information. Running renderCafeAlt instead.');
-            renderCafeAlt(cafe);
+            alert('There was an error in accessing cafe information. Please look at console for more info.');
         })
 }
 
@@ -163,7 +186,7 @@ function fetchCafes(coords) {
         v: '20180323',
         ll: `${coords.lat},${coords.lng}`,
         query: 'coffee',
-        limit: 10
+        limit: 2
     }
     const queryString = formatQueryParams(params);
     const url = endPoint + '?' + queryString;
@@ -172,7 +195,6 @@ function fetchCafes(coords) {
         .then(handleError)
         .then(response => response.json())
         .then(responseJson => {
-
             responseJson.response.groups[0].items.forEach(cafe => {
                 renderCafeAlt(cafe);
                 // fetchCafeInfo(cafe.venue.id);
@@ -231,13 +253,14 @@ function fetchUserCoords(userInput) {
             fetchCafes(coords);
         })
         .catch(error => {
-            alert('There was an error in getting coordinates');
+            alert('There was an error in finding your location');
         });
 }
 
 function handleUserSearchByLocationInput() {
     $('.js-user-input').click(event => {
         event.preventDefault();
+        $('.search-results__list').empty();
         let userInput = $('input').val();
         fetchUserCoords(userInput);
     })
@@ -246,6 +269,7 @@ function handleUserSearchByLocationInput() {
 function handleUserSearchByGeolocation() {
     $('.js-geolocation').click(event => {
         event.preventDefault();
+        $('.search-results__list').html('');
         fetchUserLocation();
     })
 }
