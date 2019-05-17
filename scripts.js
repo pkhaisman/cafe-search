@@ -100,9 +100,9 @@ function initMap(coords, cafes) {
     renderMapMarkers(cafes, map, infoWindow, coords);
 }
 
-function formatCafePicUrl(cafe) {
-    const prefix = cafe.response.venue.bestPhoto.prefix;
-    const suffix = cafe.response.venue.bestPhoto.suffix;
+function formatCafePicUrl(cafeData) {
+    const prefix = cafeData.prefix;
+    const suffix = cafeData.suffix;
     const dimensions = '100x100';
     const url = prefix + dimensions + suffix;
     return url;
@@ -120,7 +120,7 @@ function renderCafe(cafe) {
                 <a href="${cafeData.url}" target="_blank"><button class="search-results__list-item__btn">Website</button></a>
             </div>
             <div>                
-                <img class="search-results__list-item__img" src="${formatCafePicUrl(cafe)}" alt="Image of ${cafeData.name}">
+                <img class="search-results__list-item__img" src="${cafeData.bestPhoto ? formatCafePicUrl(cafeData.bestPhoto) : ""}" alt="Image of ${cafeData.name}">
             </div>
         </li>
     `);
